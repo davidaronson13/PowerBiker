@@ -28,7 +28,7 @@ int batMonPin = A4;    // input pin for the voltage divider
 int batVal = 0;       // variable for the A/D value
 float pinVoltage = 0; // variable to hold the calculated voltage
 float batteryVoltage = 0;
-float ratio = 2.1;  // Change this to match the MEASURED ration of the circuit, 12k R1 and 5k R2
+float ratio = 2.55;  // Change this to match the MEASURED ration of the circuit, 12k R1 and 5k R2
 int analogInPin = A0;  // Analog input pin that the carrier board OUT is connected to
 int sensorValue = 0;        // value read from the carrier board
 int outputValue = 0; // output in milliamps
@@ -100,7 +100,7 @@ void loop() {
   sensorValue = analogRead(analogInPin);  
   refValue = analogRead(  analogRefPin);
   
-  sensorDif = sensorValue - refValue;
+  sensorDif = sensorValue - 495; //refValue;
   // convert to milli amps
  outputValue = (((long)sensorDif * 5000 / 1024)   ) * 1000 / 28;  
  
@@ -122,7 +122,7 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
  
   
   batVal = analogRead(batMonPin);    // read the voltage on the divider 
-  pinVoltage = batVal * 0.00488;       //  Calculate the voltage on the A/D pin
+  pinVoltage = batVal * 0.00635;       //  Calculate the voltage on the A/D pin
                                     //  A reading of 1 for the A/D = 0.0048mV
                                     //  if we multiply the A/D reading by 0.00488 then 
                                     //  we get the voltage on the pin.  
@@ -252,9 +252,16 @@ void buildPage(){
           //add meta for full screen
           client.println("<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">");
           client.println("<body style=\"background-color:#000; font-size:64px;color:#0F0; \">");
+            client.print("<br />Amps: ");
+          client.print(amps);
+            client.print("<br />Volts: ");
+          client.print(batteryVoltage);
+        
           client.print("<br />Watts: ");
           client.print(watts);
+        
           client.print("<br />Watt Hours: ");
+          
           client.print(wattHours);
           // output the value of each analog input pin
         /*  for (int analogChannel = 0; analogChannel < 6; analogChannel++) {
@@ -267,23 +274,23 @@ void buildPage(){
           }*/
           client.println("</body></html>");
            break;
-        }
+        }//currentline blank
         if (c == '\n') {
           // you're starting a new line
           currentLineIsBlank = true;
-        } 
+        } //c==n
         else if (c != '\r') {
           // you've gotten a character on the current line
           currentLineIsBlank = false;
-        }
-      }
-    }
+        }//else if
+      }//client avail
+    }//while conectted
     // give the web browser time to receive the data
     delay(1);
       // close the connection:
       client.stop();
       Serial.println("client disonnected");
-  }
+  }//build page
   
-}
+//}
 
