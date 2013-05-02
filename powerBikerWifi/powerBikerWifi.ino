@@ -5,6 +5,12 @@
 
 #define RELAY1 31  
 #define RELAY2 32
+#define RELAY3 33  
+#define RELAY4 34
+#define RELAY5 35  
+#define RELAY6 36
+#define RELAY7 37  
+#define RELAY8 38
 
 /* This sketch describes how to connect a ACS715 Current Sense Carrier 
 (http://www.pololu.com/catalog/product/1186) to the Arduino, 
@@ -53,12 +59,12 @@ float watts =0.0;
 
 
 int lvl0 = 0; // 0 watts     nothing
-int lvl1 = 10; //10 watts    cell phone charge 
-int lvl2 = 100; //100 watts   light bulb
-int lvl3 = 250; // 250 watts  TV 
-int lvl4 = 350; // 350 watts  blender
-int lvl5 = 500; // 500 watts  flashing light and speakers
-
+int lvl1 = 30; //10 watts    cell phone charge 
+int lvl2 = 55; //100 watts   light bulb
+int lvl3 = 80; // 250 watts  TV 
+int lvl4 = 105; // 350 watts  blender
+int lvl5 = 130; // 500 watts  flashing light and speakers
+int lvl6 = 180;
 
 //wifi stuff
 char ssid[] = "bikeMind";      //  your network SSID (name) 
@@ -75,9 +81,21 @@ WiFiClient client;
 void setup() {
   pinMode(RELAY1, OUTPUT);          // tells arduino RELAY is an output
   pinMode(RELAY2, OUTPUT); 
+  pinMode(RELAY3, OUTPUT);          // tells arduino RELAY is an output
+  pinMode(RELAY4, OUTPUT); 
+  pinMode(RELAY5, OUTPUT);          // tells arduino RELAY is an output
+  pinMode(RELAY6, OUTPUT); 
+  pinMode(RELAY7, OUTPUT);          // tells arduino RELAY is an output
+  pinMode(RELAY8, OUTPUT); 
   
   digitalWrite(RELAY1, HIGH);
   digitalWrite(RELAY2, LOW);
+  digitalWrite(RELAY3, LOW);
+  digitalWrite(RELAY4, LOW);
+  digitalWrite(RELAY5, LOW);
+  digitalWrite(RELAY6, LOW);
+  digitalWrite(RELAY7, LOW);
+  digitalWrite(RELAY8, LOW);
   
   // initialize serial communications at 9600 bps:
   Serial.begin(9600); 
@@ -143,6 +161,7 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
                                           
                                             
   amps = (float) outputValue / 1000;
+  if(amps < 0)amps = 0;
    watts = amps * batteryVoltage;
     
   Serial.print("Volts = " );                       
@@ -158,14 +177,7 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
   Serial.print(watts);   
   
   
-  if (watts > 25){
-    digitalWrite(RELAY1, LOW);
-    digitalWrite(RELAY2, HIGH);
-  }else{
-     digitalWrite(RELAY1, HIGH);
-    digitalWrite(RELAY2, LOW);
-    
-  }
+
   
     
   sample = sample + 1;
@@ -186,6 +198,92 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
   
  wattHours = batteryVoltage * ampHours;
   
+if (watts < lvl1){
+    digitalWrite(RELAY1, HIGH);
+    digitalWrite(RELAY2, LOW);
+    digitalWrite(RELAY3, LOW);
+    digitalWrite(RELAY4, LOW);
+    digitalWrite(RELAY5, LOW);
+    digitalWrite(RELAY6, LOW);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, LOW);
+}  
+
+if (watts >= lvl1 && watts < lvl2){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+    digitalWrite(RELAY3, LOW);
+    digitalWrite(RELAY4, LOW);
+    digitalWrite(RELAY5, LOW);
+    digitalWrite(RELAY6, LOW);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, LOW);
+  
+}
+
+if (watts >= lvl2 && watts < lvl3){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+    digitalWrite(RELAY3, HIGH);
+    digitalWrite(RELAY4, LOW);
+    digitalWrite(RELAY5, LOW);
+    digitalWrite(RELAY6, LOW);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, LOW);
+  
+}
+
+if (watts >= lvl3 && watts < lvl4){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+    digitalWrite(RELAY3, HIGH);
+    digitalWrite(RELAY4, HIGH);
+    digitalWrite(RELAY5, LOW);
+    digitalWrite(RELAY6, LOW);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, LOW);
+  
+}
+if (watts >= lvl4 && watts < lvl5){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+    digitalWrite(RELAY3, HIGH);
+    digitalWrite(RELAY4, HIGH);
+    digitalWrite(RELAY5, HIGH);
+    digitalWrite(RELAY6, LOW);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, LOW);
+  
+}
+if (watts >= lvl5 && watts < lvl6){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+    digitalWrite(RELAY3, HIGH);
+    digitalWrite(RELAY4, HIGH);
+    digitalWrite(RELAY5, HIGH);
+    digitalWrite(RELAY6, HIGH);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, LOW);
+  
+}
+
+if (watts >= lvl6 ){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+    digitalWrite(RELAY3, HIGH);
+    digitalWrite(RELAY4, HIGH);
+    digitalWrite(RELAY5, HIGH);
+    digitalWrite(RELAY6, HIGH);
+    
+    digitalWrite(RELAY7, HIGH);
+    digitalWrite(RELAY8, LOW);
+    delay(500);
+     digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, HIGH);
+    delay(500);
+  
+}
+
  
 
 
