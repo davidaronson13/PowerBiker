@@ -3,6 +3,9 @@
 #include <SPI.h>
 #include <WiFi.h>
 
+#define RELAY1 31  
+#define RELAY2 32
+
 /* This sketch describes how to connect a ACS715 Current Sense Carrier 
 (http://www.pololu.com/catalog/product/1186) to the Arduino, 
 and read current flowing through the sensor.
@@ -47,6 +50,8 @@ float wattHours = 0.0;
 float amps = 0.0;
 float watts =0.0;
 
+
+
 int lvl0 = 0; // 0 watts     nothing
 int lvl1 = 10; //10 watts    cell phone charge 
 int lvl2 = 100; //100 watts   light bulb
@@ -68,6 +73,12 @@ WiFiClient client;
 
 
 void setup() {
+  pinMode(RELAY1, OUTPUT);          // tells arduino RELAY is an output
+  pinMode(RELAY2, OUTPUT); 
+  
+  digitalWrite(RELAY1, HIGH);
+  digitalWrite(RELAY2, LOW);
+  
   // initialize serial communications at 9600 bps:
   Serial.begin(9600); 
   //lcd.begin(20, 4);
@@ -100,7 +111,7 @@ void loop() {
   sensorValue = analogRead(analogInPin);  
   refValue = analogRead(  analogRefPin);
   
-  sensorDif = sensorValue - 495; //refValue;
+  sensorDif = sensorValue - 510;// refValue; //495; //
   // convert to milli amps
  outputValue = (((long)sensorDif * 5000 / 1024)   ) * 1000 / 28;  
  
@@ -146,6 +157,16 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
   Serial.print("\t Power (Watts) = ");   
   Serial.print(watts);   
   
+  
+  if (watts > 25){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+  }else{
+     digitalWrite(RELAY1, HIGH);
+    digitalWrite(RELAY2, LOW);
+    
+  }
+  
     
   sample = sample + 1;
   
@@ -177,6 +198,8 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
   Serial.print("\t Watt Hours (wh) = ");
   Serial.println(wattHours);
   
+  
+ 
 /*
   lcd.setCursor(0,0);
     lcd.print(batteryVoltage);
@@ -202,6 +225,9 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
     buildPage();
   }
   
+
+ 
+
   // wait 10 milliseconds before the next loop
   // for the analog-to-digital converter to settle
   // after the last reading:
@@ -225,6 +251,8 @@ void printWifiStatus() {
   Serial.print("signal strength (RSSI):");
   Serial.print(rssi);
   Serial.println(" dBm");
+  
+    
 }
 
 void buildPage(){
@@ -247,7 +275,7 @@ void buildPage(){
           client.println("<!DOCTYPE HTML>");
           client.println("<html>");
           // add a meta refresh tag, so the browser pulls again every 5 seconds:
-          client.println("<meta http-equiv=\"refresh\" content=\"5\">");
+          client.println("<meta http-equiv=\"refresh\" content=\"1\">");
           
           //add meta for full screen
           client.println("<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">");
