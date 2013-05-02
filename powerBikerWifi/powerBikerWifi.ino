@@ -377,16 +377,16 @@ void buildPage(){
           
           //add meta for full screen
           client.println("<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">");
-          client.println("<body style=\"background-color:#000; font-size:64px;color:#0F0; \">");
-            client.print("<br />Amps: ");
-          client.print(amps);
-            client.print("<br />Volts: ");
-          client.print(batteryVoltage);
+          client.println("<body style=\"margin:100px 100px 100px 100px; background-color:#000; font-size:72px;color:#0F0;font:sans-serif; \">");
+          //  client.print("<br />Amps: ");
+          //client.print(amps);
+          //  client.print("<br />Volts: ");
+        //  client.print(batteryVoltage);
         
           client.print("<br />Watts: ");
           client.print(watts);
         
-          client.print("<br />Watt Hours: ");
+          client.print("<br /><br />Watt Hours: ");
           
           client.print(wattHours);
           // output the value of each analog input pin
