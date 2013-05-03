@@ -56,19 +56,21 @@ float wattHours = 0.0;
 float amps = 0.0;
 float watts =0.0;
 
+float oldAmps = 0.0;
+
 
 
 int lvl0 = 0; // 0 watts     nothing
 int lvl1 = 30; //10 watts    cell phone charge 
-int lvl2 = 55; //100 watts   light bulb
-int lvl3 = 80; // 250 watts  TV 
-int lvl4 = 105; // 350 watts  blender
-int lvl5 = 130; // 500 watts  flashing light and speakers
-int lvl6 = 180;
+int lvl2 = 65; //100 watts   light bulb
+int lvl3 = 100; // 250 watts  TV 
+int lvl4 = 130; // 350 watts  blender
+int lvl5 = 160; // 500 watts  flashing light and speakers
+int lvl6 = 200;
 
 //wifi stuff
 char ssid[] = "bikeMind";      //  your network SSID (name) 
-char pass[] = "secretPassword";   // your network password
+char pass[] = "vagary2539";   // your network password
 int keyIndex = 0;                 // your network key Index number (needed only for WEP)
 
 int status = WL_IDLE_STATUS;
@@ -129,7 +131,7 @@ void loop() {
   sensorValue = analogRead(analogInPin);  
   refValue = analogRead(  analogRefPin);
   
-  sensorDif = sensorValue - 510;// refValue; //495; //
+  sensorDif = sensorValue - refValue -33;//512;//  //495; //refValue -33; //
   // convert to milli amps
  outputValue = (((long)sensorDif * 5000 / 1024)   ) * 1000 / 28;  
  
@@ -159,9 +161,20 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
   batteryVoltage = pinVoltage * ratio;    //  Use the ratio calculated for the voltage divider
                                           //  to calculate the battery voltage
                                           
+  oldAmps = amps;
+  
                                             
+ 
   amps = (float) outputValue / 1000;
+  
+  //normalize -- if the difference between this cycle and last is bigger than 5 then take the average.
+   if(oldAmps - 5 > amps){
+   //  amps = (amps + oldAmps)/2;
+      Serial.print("averaging\t");   
+   }
+  
   if(amps < 0)amps = 0;
+  
    watts = amps * batteryVoltage;
     
   Serial.print("Volts = " );                       
@@ -278,9 +291,33 @@ if (watts >= lvl6 ){
     digitalWrite(RELAY7, HIGH);
     digitalWrite(RELAY8, LOW);
     delay(500);
-     digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, HIGH);
     delay(500);
+     digitalWrite(RELAY7, HIGH);
+    digitalWrite(RELAY8, LOW);
+    delay(500);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, HIGH);
+    delay(500);
+     digitalWrite(RELAY7, HIGH);
+    digitalWrite(RELAY8, LOW);
+    delay(500);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, HIGH);
+    delay(500);
+     digitalWrite(RELAY7, HIGH);
+    digitalWrite(RELAY8, LOW);
+    delay(500);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, HIGH);
+    delay(500);
+     digitalWrite(RELAY7, HIGH);
+    digitalWrite(RELAY8, LOW);
+    delay(500);
+    digitalWrite(RELAY7, LOW);
+    digitalWrite(RELAY8, HIGH);
+   // delay(500);
   
 }
 
@@ -360,7 +397,7 @@ void buildPage(){
     while (client.connected()) {
       if (client.available()) {
         char c = client.read();
-        Serial.write(c);
+       // Serial.write(c);
         // if you've gotten to the end of the line (received a newline
         // character) and the line is blank, the http request has ended,
         // so you can send a reply
@@ -377,7 +414,7 @@ void buildPage(){
           
           //add meta for full screen
           client.println("<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">");
-          client.println("<body style=\"margin:100px 100px 100px 100px; background-color:#000; font-size:72px;color:#0F0;font:sans-serif; \">");
+          client.println("<body style=\" background-color:#000; font-size:72px;color:#0F0;font:sans-serif; \">");
           //  client.print("<br />Amps: ");
           //client.print(amps);
           //  client.print("<br />Volts: ");
