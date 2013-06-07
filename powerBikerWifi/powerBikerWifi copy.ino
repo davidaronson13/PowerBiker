@@ -36,7 +36,7 @@ power supply positive
 int batMonPin = A4;    // input pin for the voltage divider
 int batVal = 0;       // variable for the A/D value
 float pinVoltage = 0; // variable to hold the calculated voltage
-float batteryVoltage = 12;
+float batteryVoltage = 0;
 float ratio = 2.55;  // Change this to match the MEASURED ration of the circuit, 12k R1 and 5k R2
 int analogInPin = A0;  // Analog input pin that the carrier board OUT is connected to
 int sensorValue = 0;        // value read from the carrier board
@@ -58,7 +58,7 @@ float watts =0.0;
 
 float oldAmps = 0.0;
 
-int ampAdj = 30;
+int ampAdj = 50;
 
 
 int lvl0 = 0; // 0 watts     nothing
@@ -70,7 +70,7 @@ int lvl5 = 185; // 500 watts  flashing light and speakers
 int lvl6 = 220;
 
 //wifi stuff
-char ssid[] = "david";      //  your network SSID (name) 
+char ssid[] = "bikeMind";      //  your network SSID (name) 
 char pass[] = "vagary2539";   // your network password
 int keyIndex = 0;                 // your network key Index number (needed only for WEP)
 
@@ -78,14 +78,6 @@ int status = WL_IDLE_STATUS;
 
 WiFiServer server(80);
 WiFiClient client;
-
-
-//switch stuff
-
-
-const int switchPin=2;
-
-int switchState=0; //var for reading switch state
 
 
 
@@ -99,8 +91,6 @@ void setup() {
   pinMode(RELAY7, OUTPUT);          // tells arduino RELAY is an output
   pinMode(RELAY8, OUTPUT); 
   
-  pinMode(switchPin, INPUT); 
-  
   digitalWrite(RELAY1, HIGH);
   digitalWrite(RELAY2, LOW);
   digitalWrite(RELAY3, LOW);
@@ -110,31 +100,23 @@ void setup() {
   digitalWrite(RELAY7, LOW);
   digitalWrite(RELAY8, LOW);
   
- 
-  
   // initialize serial communications at 9600 bps:
   Serial.begin(9600); 
   //lcd.begin(20, 4);
-
   // check for the presence of the shield:
   if (WiFi.status() == WL_NO_SHIELD) {
     Serial.println("WiFi shield not present"); 
     // don't continue:
     while(true);
   }
-    int i=0;
+  
    // attempt to connect to Wifi network:
   while ( status != WL_CONNECTED) { 
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
     // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
-    status = WiFi.begin(ssid, pass);
-    i++;
-    if (i > 3){
-      Serial.print("Unable to connect to SSID: ");
-      Serial.println(ssid);
-      return;
-    }
+    status = WiFi.begin(ssid);
+
     // wait 10 seconds for connection:
     delay(10000);
   } 
@@ -229,12 +211,8 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
  ampHours = ampSeconds/3600;
   
  wattHours = batteryVoltage * ampHours;
- 
- switchState = digitalRead(switchPin);
-  Serial.print("\t switch Pin = ");   
-  Serial.print(switchState);  
   
-if (watts < lvl1 ){
+if (watts < lvl1){
     digitalWrite(RELAY1, HIGH);
     digitalWrite(RELAY2, LOW);
     digitalWrite(RELAY3, LOW);

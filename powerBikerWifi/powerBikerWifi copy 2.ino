@@ -80,14 +80,6 @@ WiFiServer server(80);
 WiFiClient client;
 
 
-//switch stuff
-
-
-const int switchPin=2;
-
-int switchState=0; //var for reading switch state
-
-
 
 void setup() {
   pinMode(RELAY1, OUTPUT);          // tells arduino RELAY is an output
@@ -99,8 +91,6 @@ void setup() {
   pinMode(RELAY7, OUTPUT);          // tells arduino RELAY is an output
   pinMode(RELAY8, OUTPUT); 
   
-  pinMode(switchPin, INPUT); 
-  
   digitalWrite(RELAY1, HIGH);
   digitalWrite(RELAY2, LOW);
   digitalWrite(RELAY3, LOW);
@@ -109,8 +99,6 @@ void setup() {
   digitalWrite(RELAY6, LOW);
   digitalWrite(RELAY7, LOW);
   digitalWrite(RELAY8, LOW);
-  
- 
   
   // initialize serial communications at 9600 bps:
   Serial.begin(9600); 
@@ -229,12 +217,8 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
  ampHours = ampSeconds/3600;
   
  wattHours = batteryVoltage * ampHours;
- 
- switchState = digitalRead(switchPin);
-  Serial.print("\t switch Pin = ");   
-  Serial.print(switchState);  
   
-if (watts < lvl1 ){
+if (watts < lvl1){
     digitalWrite(RELAY1, HIGH);
     digitalWrite(RELAY2, LOW);
     digitalWrite(RELAY3, LOW);
