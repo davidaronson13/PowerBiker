@@ -234,7 +234,7 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
   Serial.print("\t switch Pin = ");   
   Serial.print(switchState);  
   
-if (watts < lvl1 ){
+if (watts < lvl1 || switchState == LOW){
     digitalWrite(RELAY1, HIGH);
     digitalWrite(RELAY2, LOW);
     digitalWrite(RELAY3, LOW);
@@ -245,7 +245,7 @@ if (watts < lvl1 ){
     digitalWrite(RELAY8, LOW);
 }  
 
-if (watts >= lvl1 && watts < lvl2){
+if (watts >= lvl1 && watts < lvl2 && switchState == HIGH){
     digitalWrite(RELAY1, LOW);
     digitalWrite(RELAY2, HIGH);
     digitalWrite(RELAY3, LOW);
@@ -257,7 +257,7 @@ if (watts >= lvl1 && watts < lvl2){
   
 }
 
-if (watts >= lvl2 && watts < lvl3){
+if (watts >= lvl2 && watts < lvl3 && switchState == HIGH){
     digitalWrite(RELAY1, LOW);
     digitalWrite(RELAY2, HIGH);
     digitalWrite(RELAY3, HIGH);
@@ -269,7 +269,7 @@ if (watts >= lvl2 && watts < lvl3){
   
 }
 
-if (watts >= lvl3 && watts < lvl4){
+if (watts >= lvl3 && watts < lvl4 && switchState == HIGH){
     digitalWrite(RELAY1, LOW);
     digitalWrite(RELAY2, HIGH);
     digitalWrite(RELAY3, HIGH);
@@ -280,7 +280,7 @@ if (watts >= lvl3 && watts < lvl4){
     digitalWrite(RELAY8, LOW);
   
 }
-if (watts >= lvl4 && watts < lvl5){
+if (watts >= lvl4 && watts < lvl5 && switchState == HIGH){
     digitalWrite(RELAY1, LOW);
     digitalWrite(RELAY2, HIGH);
     digitalWrite(RELAY3, HIGH);
@@ -291,7 +291,7 @@ if (watts >= lvl4 && watts < lvl5){
     digitalWrite(RELAY8, LOW);
   
 }
-if (watts >= lvl5 && watts < lvl6){
+if (watts >= lvl5 && watts < lvl6 && switchState == HIGH){
     digitalWrite(RELAY1, LOW);
     digitalWrite(RELAY2, HIGH);
     digitalWrite(RELAY3, HIGH);
@@ -303,7 +303,7 @@ if (watts >= lvl5 && watts < lvl6){
   
 }
 
-if (watts >= lvl6 ){
+if (watts >= lvl6 && switchState == HIGH){
     digitalWrite(RELAY1, LOW);
     digitalWrite(RELAY2, HIGH);
     digitalWrite(RELAY3, HIGH);
@@ -450,15 +450,13 @@ void buildPage(){
           client.print("<br /><br />&nbsp;&nbsp;&nbsp;Watt Hours: ");
           
           client.print(wattHours);
-          // output the value of each analog input pin
-        /*  for (int analogChannel = 0; analogChannel < 6; analogChannel++) {
-            int sensorReading = analogRead(analogChannel);
-            client.print("analog input ");
-            client.print(analogChannel);
-            client.print(" is ");
-            client.print(sensorReading);
-            client.println("<br />");       
-          }*/
+          
+         if (switchState == LOW ){
+           client.print("<br /><br />&nbsp;&nbsp;&nbsp;Warming Up");
+         }else{
+            client.print("<br /><br />&nbsp;&nbsp;&nbsp;<span style=\"color:#00FF00;\">GO!</span>");
+         }
+         
           client.println("</strong</p></body></html>");
            break;
         }//currentline blank
