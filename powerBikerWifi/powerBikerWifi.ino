@@ -56,18 +56,28 @@ float wattHours = 0.0;
 float amps = 0.0;
 float watts =0.0;
 
+float highWatts=0.0;
+
 float oldAmps = 0.0;
 
 int ampAdj = 30;
 
+String levelStr = "";  
 
 int lvl0 = 0; // 0 watts     nothing
-int lvl1 = 30; //10 watts    cell phone charge 
-int lvl2 = 80; //100 watts   light bulb
-int lvl3 = 120; // 250 watts  TV 
-int lvl4 = 150; // 350 watts  blender
-int lvl5 = 185; // 500 watts  flashing light and speakers
-int lvl6 = 220;
+int lvl1 = 30; //10 watts   8 cell phones
+int lvl2 = 75; //100 watts   laptop
+int lvl3 = 120; // 250 watts  Stereo 
+int lvl4 = 150; // 350 watts  TV
+int lvl5 = 185; // 500 watts  Large TV
+int lvl6 = 220; //Fridge
+
+String lvl1Str = "8 Phones";
+String lvl2Str = "Laptop";
+String lvl3Str = "Stereo";
+String lvl4Str = "TV";
+String lvl5Str = "Big TV";
+String lvl6Str = "Fridge";
 
 //wifi stuff
 char ssid[] = "david";      //  your network SSID (name) 
@@ -234,6 +244,11 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
   Serial.print("\t switch Pin = ");   
   Serial.print(switchState);  
   
+  
+ if (watts > highWatts){
+  highWatts = watts;
+ } 
+  
 if (watts < lvl1 || switchState == LOW){
     digitalWrite(RELAY1, HIGH);
     digitalWrite(RELAY2, LOW);
@@ -243,6 +258,8 @@ if (watts < lvl1 || switchState == LOW){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
+    highWatts = 0;
+    levelStr = ""; 
 }  
 
 if (watts >= lvl1 && watts < lvl2 && switchState == HIGH){
@@ -254,6 +271,8 @@ if (watts >= lvl1 && watts < lvl2 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
+    levelStr = lvl1Str; 
+    
   
 }
 
@@ -266,6 +285,7 @@ if (watts >= lvl2 && watts < lvl3 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
+      levelStr = lvl2Str;
   
 }
 
@@ -278,6 +298,7 @@ if (watts >= lvl3 && watts < lvl4 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
+    levelStr = lvl3Str;
   
 }
 if (watts >= lvl4 && watts < lvl5 && switchState == HIGH){
@@ -289,6 +310,7 @@ if (watts >= lvl4 && watts < lvl5 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
+    levelStr = lvl4Str;
   
 }
 if (watts >= lvl5 && watts < lvl6 && switchState == HIGH){
@@ -300,10 +322,11 @@ if (watts >= lvl5 && watts < lvl6 && switchState == HIGH){
     digitalWrite(RELAY6, HIGH);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
-  
+  levelStr = lvl5Str;
 }
 
 if (watts >= lvl6 && switchState == HIGH){
+  levelStr = lvl6Str;
     digitalWrite(RELAY1, LOW);
     digitalWrite(RELAY2, HIGH);
     digitalWrite(RELAY3, HIGH);
@@ -447,16 +470,20 @@ void buildPage(){
           client.print("<p style=\"font-family:sans-serif;\"><strong><br />&nbsp;&nbsp;&nbsp;Watts: ");
           client.print(watts);
         
-          client.print("<br /><br />&nbsp;&nbsp;&nbsp;Watt Hours: ");
+        //  client.print("<br /><br />&nbsp;&nbsp;&nbsp;Watt Hours: ");
           
-          client.print(wattHours);
+       //   client.print(wattHours);
           
          if (switchState == LOW ){
            client.print("<br /><br />&nbsp;&nbsp;&nbsp;Warming Up");
          }else{
             client.print("<br /><br />&nbsp;&nbsp;&nbsp;<span style=\"color:#00FF00;\">GO!</span>");
+            client.print("<br /><br />&nbsp;&nbsp;&nbsp;Peak Watts:&nbsp;");
+            client.print(highWatts);
+             client.print("<br /><br />&nbsp;&nbsp;&nbsp;You can power a: &nbsp;");
+             client.print(levelStr);
          }
-         
+          
           client.println("</strong</p></body></html>");
            break;
         }//currentline blank
