@@ -2,6 +2,7 @@
 
 #include <SPI.h>
 #include <WiFi.h>
+//#include <SD.h>
 
 #define RELAY1 31  
 #define RELAY2 32
@@ -67,10 +68,10 @@ String levelStr = "";
 int lvl0 = 0; // 0 watts     nothing
 int lvl1 = 30; //10 watts   8 cell phones
 int lvl2 = 75; //100 watts   laptop
-int lvl3 = 120; // 250 watts  Stereo 
+int lvl3 = 110; // 250 watts  Stereo 
 int lvl4 = 150; // 350 watts  TV
 int lvl5 = 185; // 500 watts  Large TV
-int lvl6 = 220; //Fridge
+int lvl6 = 250; //Fridge
 
 String lvl1Str = "8 Phones";
 String lvl2Str = "Laptop";
@@ -97,6 +98,8 @@ const int switchPin=2;
 
 int switchState=0; //var for reading switch state
 
+//sd stuff
+//File myFile;
 
 
 void setup() {
@@ -110,10 +113,11 @@ void setup() {
   pinMode(RELAY8, OUTPUT); 
   
   pinMode(switchPin, INPUT); 
+  pinMode(10, OUTPUT);
   
   digitalWrite(RELAY1, HIGH);
   digitalWrite(RELAY2, LOW);
-  digitalWrite(RELAY3, LOW);
+  digitalWrite(RELAY3, LOW);                           
   digitalWrite(RELAY4, LOW);
   digitalWrite(RELAY5, LOW);
   digitalWrite(RELAY6, LOW);
@@ -140,7 +144,7 @@ void setup() {
     // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
     status = WiFi.begin(ssid, pass);
     i++;
-    if (i > 3){
+    if (i >=                   0){
       Serial.print("Unable to connect to SSID: ");
       Serial.println(ssid);
       return;
@@ -149,8 +153,14 @@ void setup() {
     delay(10000);
   } 
   server.begin();
+  
+ /* if (!SD.begin(4)) {
+    Serial.println("initialization failed!");
+    //return;
+  }*/
   // you're connected now, so print out the status:
   printWifiStatus();
+ // myFile = SD.open("wattHours.txt", FILE_WRITE);
   
 }
 
