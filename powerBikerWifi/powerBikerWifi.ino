@@ -66,12 +66,12 @@ int ampAdj = 30;
 String levelStr = "";  
 
 int lvl0 = 0; // 0 watts     nothing
-int lvl1 = 30; //10 watts   8 cell phones
-int lvl2 = 75; //100 watts   laptop
-int lvl3 = 110; // 250 watts  Stereo 
+int lvl1 = 25; //10 watts   8 cell phones
+int lvl2 = 60; //100 watts   laptop
+int lvl3 = 100; // 250 watts  Stereo 
 int lvl4 = 150; // 350 watts  TV
-int lvl5 = 185; // 500 watts  Large TV
-int lvl6 = 250; //Fridge
+int lvl5 = 180; // 500 watts  Large TV
+int lvl6 = 220; //Fridge
 
 String lvl1Str = "8 Phones";
 String lvl2Str = "Laptop";
@@ -142,7 +142,8 @@ void setup() {
     Serial.print("Attempting to connect to SSID: ");
     Serial.println(ssid);
     // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
-    status = WiFi.begin(ssid, pass);
+    status = WiFi.begin(ssid  );
+    // status = WiFi.begin(ssid, pass);
     i++;
     if (i >=                   0){
       Serial.print("Unable to connect to SSID: ");
@@ -150,7 +151,7 @@ void setup() {
       return;
     }
     // wait 10 seconds for connection:
-    delay(10000);
+    delay(1000);
   } 
   server.begin();
   
@@ -253,11 +254,56 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
  switchState = digitalRead(switchPin);
   Serial.print("\t switch Pin = ");   
   Serial.print(switchState);  
+ 
+ if (switchState == LOW){
   
+    highWatts = 0;
+    levelStr = ""; 
+}   
   
  if (watts > highWatts){
   highWatts = watts;
  } 
+ 
+ if (highWatts < lvl1 ){
+
+    levelStr = ""; 
+}  
+
+if (highWatts >= lvl1 && highWatts < lvl2){
+ 
+    levelStr = lvl1Str; 
+    
+  
+}
+
+if (highWatts >= lvl2 && highWatts < lvl3 ){
+   
+      levelStr = lvl2Str;
+  
+}
+
+if (highWatts >= lvl3 && highWatts < lvl4 ){
+   
+    levelStr = lvl3Str;
+  
+}
+if (highWatts >= lvl4 && highWatts < lvl5 ){
+   
+    levelStr = lvl4Str;
+  
+}
+if (highWatts >= lvl5 && highWatts < lvl6 ){
+   
+  levelStr = lvl5Str;
+}
+
+if (highWatts >= lvl6 ){
+  levelStr = lvl6Str;
+   
+  
+}
+
   
 if (watts < lvl1 || switchState == LOW){
     digitalWrite(RELAY1, HIGH);
@@ -268,8 +314,8 @@ if (watts < lvl1 || switchState == LOW){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
-    highWatts = 0;
-    levelStr = ""; 
+   
+    
 }  
 
 if (watts >= lvl1 && watts < lvl2 && switchState == HIGH){
@@ -281,7 +327,7 @@ if (watts >= lvl1 && watts < lvl2 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
-    levelStr = lvl1Str; 
+   
     
   
 }
@@ -295,7 +341,7 @@ if (watts >= lvl2 && watts < lvl3 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
-      levelStr = lvl2Str;
+      
   
 }
 
@@ -308,7 +354,7 @@ if (watts >= lvl3 && watts < lvl4 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
-    levelStr = lvl3Str;
+   
   
 }
 if (watts >= lvl4 && watts < lvl5 && switchState == HIGH){
@@ -320,7 +366,7 @@ if (watts >= lvl4 && watts < lvl5 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
-    levelStr = lvl4Str;
+   
   
 }
 if (watts >= lvl5 && watts < lvl6 && switchState == HIGH){
@@ -332,11 +378,11 @@ if (watts >= lvl5 && watts < lvl6 && switchState == HIGH){
     digitalWrite(RELAY6, HIGH);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
-  levelStr = lvl5Str;
+ 
 }
 
 if (watts >= lvl6 && switchState == HIGH){
-  levelStr = lvl6Str;
+ 
     digitalWrite(RELAY1, LOW);
     digitalWrite(RELAY2, HIGH);
     digitalWrite(RELAY3, HIGH);
@@ -350,32 +396,7 @@ if (watts >= lvl6 && switchState == HIGH){
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, HIGH);
     delay(200);
-   /*  digitalWrite(RELAY7, HIGH);
-    digitalWrite(RELAY8, LOW);
-    delay(200);
-    digitalWrite(RELAY7, LOW);
-    digitalWrite(RELAY8, HIGH);
-   
-    delay(500);
-     digitalWrite(RELAY7, HIGH);
-    digitalWrite(RELAY8, LOW);
-    delay(500);
-    digitalWrite(RELAY7, LOW);
-    digitalWrite(RELAY8, HIGH);
-    delay(500);
-     digitalWrite(RELAY7, HIGH);
-    digitalWrite(RELAY8, LOW);
-    delay(500);
-    digitalWrite(RELAY7, LOW);
-    digitalWrite(RELAY8, HIGH);
-    delay(500);
-     digitalWrite(RELAY7, HIGH);
-    digitalWrite(RELAY8, LOW);
-    delay(500);
-    digitalWrite(RELAY7, LOW);
-    digitalWrite(RELAY8, HIGH);
-   // delay(500);
-  */
+  
 }
 
  
