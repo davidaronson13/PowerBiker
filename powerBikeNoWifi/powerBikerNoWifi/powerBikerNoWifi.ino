@@ -69,8 +69,8 @@ int lvl0 = 0; // 0 watts     nothing
 int lvl1 = 25; //10 watts   8 cell phones
 int lvl2 = 50; //100 watts   laptop
 int lvl3 = 75; // 250 watts  Stereo 
-int lvl4 = 125; // 350 watts  TV
-int lvl5 = 150; // 500 watts  Large TV
+int lvl4 = 120; // 350 watts  TV
+int lvl5 = 160; // 500 watts  Large TV
 int lvl6 = 220; //Fridge
 
 String lvl1Str = "8 Phones";
