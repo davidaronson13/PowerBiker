@@ -97,6 +97,7 @@ int keyIndex = 0;                 // your network key Index number (needed only 
 const int switchPin=2;
 
 int switchState=0; //var for reading switch state
+boolean warmUp = false;
 
 //adjustment
 
@@ -118,6 +119,57 @@ int index = 0;                  // the index of the current reading
 int total = 0;                  // the running total
 int average = 0;                // the average
 
+
+//
+///digital display
+//
+/*
+  Code for interfacing with 7 segment displays
+ using the multiplexing method
+ and the TPIC6B595 Shift Register (1 per digit)
+ By K.O.
+ */
+
+//Pin Assignments (You should change these)
+const int CLK       = 13;           //Connected to TPIC pin 13: SRCLK (aka Clock)
+const int LATCH     = 10;          //Connected to TPIC pin 12: RCLK (aka Latch/load/CS/SS...)
+const int OE        = 9;          //Connected to TPIC pin 9: OE (Output Enable)
+const int DOUT      = 11;          //Connected to TPIC pin 3: SER (aka MOSI)
+
+//Number Patterns (0-9)
+//***Drains 0-7 must be connected to segments A-DP respectively***
+const byte numTable[] =
+{
+  B11011110,  //0x
+  B00000110,  //1x
+  B10111010,  //2x
+  B10101110,  //3x
+  B01100110,  //4x
+  B11101100,  //5x
+  B11111100,  //6x
+  B10000110,  //7x
+  B11111110,  //8 x
+  B11100110,  //9
+  B00000000  //10 -- -nothing on
+};
+
+//Global Variables
+int numDevices = 1;                       //The number of x-digit display modules you plan to use
+int maxDisplays = 1;                      //The maximum displays that could be accommodated (see note 1)
+int maxDigits = 3;                        //The maximum digits you plan on displaying per display module (each SR can handle a max of 8 digits)
+int SRData[1][3];                         //The storage location for the digit information. We must specify a fixed array at compile time (see note 2)
+boolean debug = false;                     //Change to true to print messages
+int delayTime =0;                     //Optional (just for demonstrating multiplexing)
+int hiWatts = 0;
+/*
+  Notes
+ 1. It is recommended to use an external power supply to avoid oversource/sinking the microcontroller
+    or if you need to power high voltage, high current displays. This code will turn on/off all segments in a digit for ***each*** display.
+    So, if using 2x 3-digit displays all displaying an 8 + DP, the max consumption will be:
+       20mA (desired forward current) * 8 (segments that are on) * 2 (displays showing identical info) = 320mA
+ 2. The first dimension should equal maxDisplays. The second dimension should equal the number of digits
+ */
+ 
 
 void setup() {
   pinMode(RELAY1, OUTPUT);          // tells arduino RELAY is an output
@@ -151,40 +203,22 @@ void setup() {
   for (int thisReading = 0; thisReading < numReadings; thisReading++)
     readings[thisReading] = 0; 
 
-  // check for the presence of the shield:
- /* if (WiFi.status() == WL_NO_SHIELD) {
-    Serial.println("WiFi shield not present"); 
-    // don't continue:
-    while(true);
-    }
-  
-    int i=0;
-   // attempt to connect to Wifi network:
-  while ( status != WL_CONNECTED) { 
-    Serial.print("Attempting to connect to SSID: ");
-    Serial.println(ssid);
-    // Connect to WPA/WPA2 network. Change this line if using open or WEP network:    
-    status = WiFi.begin(ssid  );
-    // status = WiFi.begin(ssid, pass);
-    i++;
-    if (i >=                   0){
-      Serial.print("Unable to connect to SSID: ");
-      Serial.println(ssid);
-      return;
-    }
-    // wait 10 seconds for connection:
-    delay(1000);
-  } 
-  server.begin();
-  
-  if (!SD.begin(4)) {
-    Serial.println("initialization failed!");
-    //return;
-  }
-  // you're connected now, so print out the status:
-  printWifiStatus();
- // myFile = SD.open("wattHours.txt", FILE_WRITE);
-  */
+//digi displays
+ //Set pin modes
+  pinMode(CLK,OUTPUT);
+  pinMode(LATCH,OUTPUT);
+  pinMode(DOUT, OUTPUT);
+  pinMode(OE, OUTPUT);
+
+  //7-Segment Display Init
+  digitalWrite(OE,LOW);        //Enables SR Operation
+  initializeSRData();          //Prepares SR and clears data on serial line
+
+  //Test
+  setDigit(0,0,0,false);
+  setDigit(0,1,0,false);
+  setDigit(0,2,0,false);
+ 
 }
 
 void loop() {
@@ -309,54 +343,21 @@ changed 1000/133 to 1000/28 for the 75 amp range sensor no offset either
   Serial.print("\t switch Pin = ");   
   Serial.print(switchState);  
  
- if (switchState == LOW){
+ if (switchState == LOW  ){
   
     highWatts = 0;
+    hiWatts = 0;
     levelStr = ""; 
-}   
+    refreshDisplay(0); 
+}  
   
- if (watts > highWatts){
+ if (watts > highWatts  && switchState == HIGH ){
   highWatts = watts;
+  hiWatts = int(highWatts);
+  refreshDisplay(hiWatts); 
+  
  } 
  
- if (highWatts < lvl1 ){
-
-    levelStr = ""; 
-}  
-
-if (highWatts >= lvl1 && highWatts < lvl2){
- 
-    levelStr = lvl1Str; 
-    
-  
-}
-
-if (highWatts >= lvl2 && highWatts < lvl3 ){
-   
-      levelStr = lvl2Str;
-  
-}
-
-if (highWatts >= lvl3 && highWatts < lvl4 ){
-   
-    levelStr = lvl3Str;
-  
-}
-if (highWatts >= lvl4 && highWatts < lvl5 ){
-   
-    levelStr = lvl4Str;
-  
-}
-if (highWatts >= lvl5 && highWatts < lvl6 ){
-   
-  levelStr = lvl5Str;
-}
-
-if (highWatts >= lvl6 ){
-  levelStr = lvl6Str;
-   
-  
-}
 
   
 if (watts < lvl1 || switchState == LOW){
@@ -467,32 +468,7 @@ if (watts >= lvl6 && switchState == HIGH){
   
   
  
-/*
-  lcd.setCursor(0,0);
-    lcd.print(batteryVoltage);
-    lcd.print(" V ");
-    lcd.print(amps);
-    lcd.print(" A ");
-  
-  lcd.setCursor(0,1);
-  lcd.print(watts);
-  lcd.print(" W ");
-  lcd.print(time/3600);
-  lcd.print(" H ");
-  
-  lcd.setCursor(0,2);
-  lcd.print(ampHours);
-  lcd.print(" Ah ");
-  lcd.print(wattHours);
-  lcd.print(" Wh ");
-  */
-   // listen for incoming clients
-/*
- client = server.available();
-  if (client) {
-    buildPage();
-  }
-  */
+
 
  
 
@@ -502,93 +478,191 @@ if (watts >= lvl6 && switchState == HIGH){
   delay(10);                     
 }
 
-/*
 
-void printWifiStatus() {
-  // print the SSID of the network you're attached to:
-  Serial.print("SSID: ");
-  Serial.println(WiFi.SSID());
+//==========BEGIN SR Functions==========
+void initializeSRData()
+{
+  //Display Scanner (Iterates through each display module)
+  digitalWrite(LATCH,LOW);      //Tells all SRs that uController is sending data
 
-  // print your WiFi shield's IP address:
-  IPAddress ip = WiFi.localIP();
-  Serial.print("IP Address: ");
-  Serial.println(ip);
-
-  // print the received signal strength:
-  long rssi = WiFi.RSSI();
-  Serial.print("signal strength (RSSI):");
-  Serial.print(rssi);
-  Serial.println(" dBm");
-  
-    
+  for(int dispID = 0; dispID < maxDisplays; dispID++)
+  {    
+    //Digit Scanner (Iterates through each SR (digit) in a display module)
+    for(int digit = 0; digit < maxDigits; digit++)
+    {
+      //Clears any garbage on the serial line
+      shiftOut(DOUT,CLK,LSBFIRST,0);          //Shift out 0s to all displays
+      SRData[dispID][digit] = 0;              //Stores a 0 for each digit so its completely off
+    }
+  }
+  digitalWrite(LATCH,HIGH);      //Tells all SRs that uController is done sending data
 }
 
-void buildPage(){
-   Serial.println("new client");
-    // an http request ends with a blank line
-    boolean currentLineIsBlank = true;
-    while (client.connected()) {
-      if (client.available()) {
-        char c = client.read();
-       // Serial.write(c);
-        // if you've gotten to the end of the line (received a newline
-        // character) and the line is blank, the http request has ended,
-        // so you can send a reply
-        if (c == '\n' && currentLineIsBlank) {
-          // send a standard http response header
-          client.println("HTTP/1.1 200 OK");
-          client.println("Content-Type: text/html");
-          client.println("Connection: close");
-          client.println();
-          client.println("<!DOCTYPE HTML>");
-          client.println("<html>");
-          // add a meta refresh tag, so the browser pulls again every 5 seconds:
-          client.println("<meta http-equiv=\"refresh\" content=\"1\">");
-          
-          //add meta for full screen
-          client.println("<meta name=\"apple-mobile-web-app-capable\" content=\"yes\">");
-          client.println("<body style=\" background-color:#000; font-size:86px;color:#F00;font:sans-serif; \">");
-          //  client.print("<br />Amps: ");
-          //client.print(amps);
-          //  client.print("<br />Volts: ");
-        //  client.print(batteryVoltage);
+void printSRData()
+{
+  if(!debug)
+    return;
+
+  Serial.println("Printing SR Data...");
+
+  //Display Scanner
+  for(int dispID = 0; dispID < maxDisplays; dispID++)
+  {    
+    Serial.print("Display # ");
+    Serial.println(dispID);
+
+    //Digit Scanner
+    for(int digit = 0; digit < maxDigits; digit++)
+    {
+      Serial.print("Digit ");
+      Serial.print(digit);
+      Serial.print(": ");
+      Serial.println(SRData[dispID][digit],BIN);
+    }
+    Serial.println();
+  }
+}
+
+void setDigit(int dispID, int digit, int value, boolean dp)
+{
+  //Parameter checker
+  if(dispID < 0 || dispID >= numDevices)
+  {
+    Serial.println("dispID OoB!");         //OoB = Out of bounds
+    return;
+  }
+
+  if(digit < 0 || digit > maxDigits)
+  {
+    Serial.println("digit OoB!"); 
+    return;
+  }
+
+  if(value < 0 || value > 10)
+  {
+    Serial.println("Invalid value!"); 
+    return;
+  }
+
+  value = numTable[value];
+
+  //Toggle dp if needed
+  if(dp)
+    value |= B00000001;          //Turns on the first binary digit (segment) using an OR bitmask
+
+  //Store the digit
+  SRData[dispID][digit] = value;
+
+  if(debug)
+    printSRData();
+}
+
+void setSegments(int dispID, int digit, byte value)
+{
+  //Parameter checker
+  if(dispID < 0 || dispID >= numDevices)
+  {
+    Serial.println("dispID OoB!"); 
+    return;
+  }
+
+  if(digit < 0 || digit > maxDigits)
+  {
+    Serial.println("digit OoB!"); 
+    return;
+  }
+
+  if(value < 0 || value > 255)
+  {
+    Serial.println("Invalid byte!"); 
+    return;
+  }
+
+  //Store the digit
+  SRData[dispID][digit] = value;
+
+  if(debug)
+    printSRData();
+}
+
+void clearDisplay(int dispID)
+{
+  initializeSRData();
+  refreshDisplay(000);
+ 
+}
+
+void refreshDisplay(int num)
+{
+ 
+ 
+  int third=num/100;
+ int second=num%100/10;
+ int first=num%10;
+ 
+ if(third < 1){
+ setDigit(0,2,10,false);
+ }else {
+   
+    setDigit(0,2,third,false);
+ }
+ 
+ if(third < 1 && second < 1)  {
+  setDigit(0,1,10,false);
+ }else{
+   
+   setDigit(0,1,second,false);
+ }
+  if(third < 1 && second < 1 && first < 1)  {
+  setDigit(0,0,10,false);
+ }else{
+   
+   setDigit(0,0,first,false);
+ }
+ 
+// setDigit(0,0,first,false);
+ 
+  //Digit Scanner
+  for(int digit = 0; digit < maxDigits; digit++)
+  {   
+   // Serial.print("digit ");
+     //Serial.println(digit);
+    //Display Scanner
+    digitalWrite(LATCH,LOW);
+    for(int dispID = numDevices -  1; dispID >= 0; dispID--)
+    {
+    //  Serial.print("dispID ");
+    // Serial.println(dispID);
+      //Pre-Digit blanker (shifts out 0s to correct digits before sending segment data to desired digit)
+      for(int blanks = (maxDigits - 1 - digit); blanks > 0; blanks--){
+      //  shiftOut(DOUT,CLK,LSBFIRST,0);
+      }
+
+      shiftOut(DOUT,CLK,LSBFIRST,SRData[dispID][digit]);
+  //    Serial.print("SRData ");
+    // Serial.println(SRData[dispID][digit],BIN);
+      
+
+      //Post-Digit blanker (shifts out 0s to remaining digits)
+      for(int blanks = digit; blanks > 0; blanks--){
+     //   shiftOut(DOUT,CLK,LSBFIRST,0);
+       // Serial.print("blanks ");
+    // Serial.println(blanks);
+     
         
-          client.print("<p style=\"font-family:sans-serif;\"><strong><br />&nbsp;&nbsp;&nbsp;Watts: ");
-          client.print(watts);
-        
-        //  client.print("<br /><br />&nbsp;&nbsp;&nbsp;Watt Hours: ");
-          
-       //   client.print(wattHours);
-          
-         if (switchState == LOW ){
-           client.print("<br /><br />&nbsp;&nbsp;&nbsp;Warming Up");
-         }else{
-            client.print("<br /><br />&nbsp;&nbsp;&nbsp;<span style=\"color:#00FF00;\">GO!</span>");
-            client.print("<br /><br />&nbsp;&nbsp;&nbsp;Peak Watts:&nbsp;");
-            client.print(highWatts);
-             client.print("<br /><br />&nbsp;&nbsp;&nbsp;You can power a: &nbsp;");
-             client.print(levelStr);
-         }
-          
-          client.println("</strong</p></body></html>");
-           break;
-        }//currentline blank
-        if (c == '\n') {
-          // you're starting a new line
-          currentLineIsBlank = true;
-        } //c==n
-        else if (c != '\r') {
-          // you've gotten a character on the current line
-          currentLineIsBlank = false;
-        }//else if
-      }//client avail
-    }//while conectted
-    // give the web browser time to receive the data
-    delay(1);
-      // close the connection:
-      client.stop();
-      Serial.println("client disonnected");
-  }//build page
-  */
-//}
+      }
+   //   Serial.println(" ");
+    }
+    digitalWrite(LATCH,HIGH);
+
+    //Demonstrates multiplexing operation
+   // delay(delayTime);
+   // delayTime -= 10;
+    //if(delayTime <= 0)
+      //delayTime = 0;
+  }
+}
+
+//==========END SR Functions==========
+
 
