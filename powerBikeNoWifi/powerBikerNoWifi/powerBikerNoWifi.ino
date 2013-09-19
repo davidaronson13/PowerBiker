@@ -12,6 +12,9 @@
 #define RELAY6 36
 #define RELAY7 37  
 #define RELAY8 38
+#define RELAY9 39
+#define RELAY10 40  
+#define RELAY11 41
 
 /* This sketch describes how to connect a ACS715 Current Sense Carrier 
 (http://www.pololu.com/catalog/product/1186) to the Arduino, 
@@ -71,7 +74,10 @@ int lvl2 = 50; //100 watts   laptop
 int lvl3 = 75; // 250 watts  Stereo 
 int lvl4 = 120; // 350 watts  TV
 int lvl5 = 160; // 500 watts  Large TV
-int lvl6 = 220; //Fridge
+int lvl6 = 225; //Fridge
+int lvl7 = 300;
+int lvl8 = 400;
+int lvl9 = 500;
 
 String lvl1Str = "8 Phones";
 String lvl2Str = "Laptop";
@@ -179,7 +185,10 @@ void setup() {
   pinMode(RELAY5, OUTPUT);          // tells arduino RELAY is an output
   pinMode(RELAY6, OUTPUT); 
   pinMode(RELAY7, OUTPUT);          // tells arduino RELAY is an output
-  pinMode(RELAY8, OUTPUT); 
+  pinMode(RELAY8, OUTPUT);
+  pinMode(RELAY9, OUTPUT); 
+  pinMode(RELAY10, OUTPUT); 
+  pinMode(RELAY11, OUTPUT);  
   
   pinMode(switchPin, INPUT); 
   pinMode(10, OUTPUT);
@@ -192,6 +201,9 @@ void setup() {
   digitalWrite(RELAY6, LOW);
   digitalWrite(RELAY7, LOW);
   digitalWrite(RELAY8, LOW);
+  digitalWrite(RELAY9, LOW);
+  digitalWrite(RELAY10, LOW);
+  digitalWrite(RELAY11, LOW);
   
  
   
@@ -369,7 +381,9 @@ if (watts < lvl1 || switchState == LOW){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
-   
+    digitalWrite(RELAY9, LOW);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, LOW);
     
 }  
 
@@ -382,7 +396,9 @@ if (watts >= lvl1 && watts < lvl2 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
-   
+    digitalWrite(RELAY9, LOW);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, LOW);
     
   
 }
@@ -396,6 +412,9 @@ if (watts >= lvl2 && watts < lvl3 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
+    digitalWrite(RELAY9, LOW);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, LOW);
       
   
 }
@@ -409,6 +428,9 @@ if (watts >= lvl3 && watts < lvl4 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
+    digitalWrite(RELAY9, LOW);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, LOW);
    
   
 }
@@ -421,6 +443,9 @@ if (watts >= lvl4 && watts < lvl5 && switchState == HIGH){
     digitalWrite(RELAY6, LOW);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
+    digitalWrite(RELAY9, LOW);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, LOW);
    
   
 }
@@ -433,10 +458,55 @@ if (watts >= lvl5 && watts < lvl6 && switchState == HIGH){
     digitalWrite(RELAY6, HIGH);
     digitalWrite(RELAY7, LOW);
     digitalWrite(RELAY8, LOW);
+    digitalWrite(RELAY9, LOW);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, LOW);
+ 
+}
+if (watts >= lvl6 && watts < lvl7 && switchState == HIGH){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+    digitalWrite(RELAY3, HIGH);
+    digitalWrite(RELAY4, HIGH);
+    digitalWrite(RELAY5, HIGH);
+    digitalWrite(RELAY6, HIGH);
+    digitalWrite(RELAY7, HIGH);
+    digitalWrite(RELAY8, LOW);
+    digitalWrite(RELAY9, LOW);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, LOW);
+ 
+}
+if (watts >= lvl7 && watts < lvl8 && switchState == HIGH){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+    digitalWrite(RELAY3, HIGH);
+    digitalWrite(RELAY4, HIGH);
+    digitalWrite(RELAY5, HIGH);
+    digitalWrite(RELAY6, HIGH);
+    digitalWrite(RELAY7, HIGH);
+    digitalWrite(RELAY8, HIGH;
+    digitalWrite(RELAY9, LOW);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, LOW);
+ 
+}
+if (watts >= lvl8 && watts < lvl9 && switchState == HIGH){
+    digitalWrite(RELAY1, LOW);
+    digitalWrite(RELAY2, HIGH);
+    digitalWrite(RELAY3, HIGH);
+    digitalWrite(RELAY4, HIGH);
+    digitalWrite(RELAY5, HIGH);
+    digitalWrite(RELAY6, HIGH);
+    digitalWrite(RELAY7, HIGH);
+    digitalWrite(RELAY8, HIGH;
+    digitalWrite(RELAY9, HIGH);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, LOW);
  
 }
 
-if (watts >= lvl6 && switchState == HIGH){
+if (watts >= lvl9 && switchState == HIGH){
  
     digitalWrite(RELAY1, LOW);
     digitalWrite(RELAY2, HIGH);
@@ -444,12 +514,14 @@ if (watts >= lvl6 && switchState == HIGH){
     digitalWrite(RELAY4, HIGH);
     digitalWrite(RELAY5, HIGH);
     digitalWrite(RELAY6, HIGH);
-    
     digitalWrite(RELAY7, HIGH);
-    digitalWrite(RELAY8, LOW);
+    digitalWrite(RELAY8, HIGH;
+    digitalWrite(RELAY9, HIGH);
+    digitalWrite(RELAY10, HIGH);
+    digitalWrite(RELAY11, LOW);
     delay(200);
-    digitalWrite(RELAY7, LOW);
-    digitalWrite(RELAY8, HIGH);
+    digitalWrite(RELAY10, LOW);
+    digitalWrite(RELAY11, HIGH);
     delay(200);
   
 }
