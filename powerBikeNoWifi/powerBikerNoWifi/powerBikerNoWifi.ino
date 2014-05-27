@@ -485,7 +485,7 @@ if (watts >= lvl7 && watts < lvl8 && switchState == HIGH){
     digitalWrite(RELAY5, HIGH);
     digitalWrite(RELAY6, HIGH);
     digitalWrite(RELAY7, HIGH);
-    digitalWrite(RELAY8, HIGH;
+    digitalWrite(RELAY8, HIGH);
     digitalWrite(RELAY9, LOW);
     digitalWrite(RELAY10, LOW);
     digitalWrite(RELAY11, LOW);
@@ -499,7 +499,7 @@ if (watts >= lvl8 && watts < lvl9 && switchState == HIGH){
     digitalWrite(RELAY5, HIGH);
     digitalWrite(RELAY6, HIGH);
     digitalWrite(RELAY7, HIGH);
-    digitalWrite(RELAY8, HIGH;
+    digitalWrite(RELAY8, HIGH);
     digitalWrite(RELAY9, HIGH);
     digitalWrite(RELAY10, LOW);
     digitalWrite(RELAY11, LOW);
@@ -515,7 +515,7 @@ if (watts >= lvl9 && switchState == HIGH){
     digitalWrite(RELAY5, HIGH);
     digitalWrite(RELAY6, HIGH);
     digitalWrite(RELAY7, HIGH);
-    digitalWrite(RELAY8, HIGH;
+    digitalWrite(RELAY8, HIGH);
     digitalWrite(RELAY9, HIGH);
     digitalWrite(RELAY10, HIGH);
     digitalWrite(RELAY11, LOW);
